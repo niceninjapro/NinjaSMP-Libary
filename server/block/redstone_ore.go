@@ -1,6 +1,9 @@
 package block
 
-import "github.com/df-mc/dragonfly/server/item"
+import (
+	"github.com/df-mc/dragonfly/server/item"
+	"github.com/df-mc/dragonfly/server/world" // Add this import
+)
 
 // RedstoneOre is a common ore.
 type RedstoneOre struct {
@@ -30,4 +33,14 @@ func (r RedstoneOre) EncodeItem() (name string, meta int16) {
 func (r RedstoneOre) EncodeBlock() (string, map[string]any) {
 	return "minecraft:" + r.Type.Prefix() + "redstone_ore", nil
 
+}
+
+// DecodeNBT implements world.NBTer and allows the block to load even if NBT data is present.
+func (r RedstoneOre) DecodeNBT(data map[string]any) world.Block {
+	return r
+}
+
+// EncodeNBT implements world.NBTer.
+func (r RedstoneOre) EncodeNBT() map[string]any {
+	return nil
 }

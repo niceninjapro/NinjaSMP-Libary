@@ -233,6 +233,7 @@ func init() {
 	registerAll(allCopperTorches())
 	registerAll(allCopperTrapdoors())
 	registerAll(allBeeNests())
+	registerAll(allGlowLichens())
 }
 
 func init() {
@@ -241,6 +242,7 @@ func init() {
 	world.RegisterItem(AncientDebris{})
 	world.RegisterItem(Andesite{Polished: true})
 	world.RegisterItem(Andesite{})
+	world.RegisterItem(GlowLichen{})
 	world.RegisterItem(Barrel{})
 	world.RegisterItem(Barrier{})
 	world.RegisterItem(Basalt{Polished: true})

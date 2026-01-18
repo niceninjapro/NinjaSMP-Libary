@@ -258,12 +258,12 @@ func allSculkVeins() (b []world.Block) {
 func (s SculkVein) DecodeNBT(data map[string]any) any {
 	if v, ok := data["multi_face_direction_bits"]; ok {
 		bits := v.(int32)
-		s.Down  = bits&0x1 != 0
-		s.Up    = bits&0x2 != 0
+		s.Down = bits&0x1 != 0
+		s.Up = bits&0x2 != 0
 		s.North = bits&0x4 != 0
 		s.South = bits&0x8 != 0
-		s.West  = bits&0x10 != 0
-		s.East  = bits&0x20 != 0
+		s.West = bits&0x10 != 0
+		s.East = bits&0x20 != 0
 	}
 	return s
 }
@@ -271,12 +271,24 @@ func (s SculkVein) DecodeNBT(data map[string]any) any {
 // EncodeNBT converts the struct fields back into the bitmask for saving.
 func (s SculkVein) EncodeNBT() map[string]any {
 	var bits int32
-	if s.Down  { bits |= 0x1 }
-	if s.Up    { bits |= 0x2 }
-	if s.North { bits |= 0x4 }
-	if s.South { bits |= 0x8 }
-	if s.West  { bits |= 0x10 }
-	if s.East  { bits |= 0x20 }
+	if s.Down {
+		bits |= 0x1
+	}
+	if s.Up {
+		bits |= 0x2
+	}
+	if s.North {
+		bits |= 0x4
+	}
+	if s.South {
+		bits |= 0x8
+	}
+	if s.West {
+		bits |= 0x10
+	}
+	if s.East {
+		bits |= 0x20
+	}
 
 	return map[string]any{
 		"multi_face_direction_bits": bits,

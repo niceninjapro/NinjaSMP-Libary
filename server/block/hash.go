@@ -90,6 +90,7 @@ const (
 	hashGlass
 	hashGlassPane
 	hashGlazedTerracotta
+	hashGlowLichen
 	hashGlowstone
 	hashGold
 	hashGoldOre
@@ -563,6 +564,10 @@ func (t GlazedTerracotta) Hash() (uint64, uint64) {
 	return hashGlazedTerracotta, uint64(t.Colour.Uint8()) | uint64(t.Facing)<<4
 }
 
+func (g GlowLichen) Hash() (uint64, uint64) {
+	return hashGlowLichen, uint64(boolByte(g.Down)) | uint64(boolByte(g.Up))<<1 | uint64(boolByte(g.North))<<2 | uint64(boolByte(g.South))<<3 | uint64(boolByte(g.West))<<4 | uint64(boolByte(g.East))<<5
+}
+
 func (Glowstone) Hash() (uint64, uint64) {
 	return hashGlowstone, 0
 }
@@ -1000,7 +1005,7 @@ func (t TuffBricks) Hash() (uint64, uint64) {
 }
 
 func (v Vines) Hash() (uint64, uint64) {
-	return hashVines, uint64(boolByte(v.NorthDirection)) | uint64(boolByte(v.EastDirection))<<1 | uint64(boolByte(v.SouthDirection))<<2 | uint64(boolByte(v.WestDirection))<<3
+	return hashVines, uint64(boolByte(v.NorthDirection)) | uint64(boolByte(v.EastDirection))<<1 | uint64(boolByte(v.SouthDirection))<<2 | uint64(boolByte(v.WestDirection))<<3 | uint64(boolByte(v.Up))<<4
 }
 
 func (w Wall) Hash() (uint64, uint64) {

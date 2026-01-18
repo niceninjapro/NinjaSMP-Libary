@@ -1,12 +1,13 @@
 package block
 
 import (
+	"math/rand/v2"
+
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/block/model"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/go-gl/mathgl/mgl64"
-	"math/rand/v2"
 )
 
 // Vines are climbable non-solid vegetation blocks that grow on walls.
@@ -24,6 +25,8 @@ type Vines struct {
 	SouthDirection bool
 	// WestDirection is true if the vines are attached towards west.
 	WestDirection bool
+	// Up is true if the vines are hanging from above.
+	Up bool
 }
 
 // CompostChance ...
@@ -50,7 +53,12 @@ func (Vines) FlammabilityInfo() FlammabilityInfo {
 func (v Vines) BreakInfo() BreakInfo {
 	return newBreakInfo(0.2, func(t item.Tool) bool {
 		return t.ToolType() == item.TypeShears
-	}, axeEffective, oneOf(v))
+	}, axeEffective, func(t item.Tool, enchantments []item.Enchantment) []item.Stack {
+		if t.ToolType() == item.TypeShears {
+			return []item.Stack{item.NewStack(v, 1)}
+		}
+		return nil
+	})
 }
 
 // EntityInside ...
@@ -266,15 +274,17 @@ func (Vines) EncodeItem() (name string, meta int16) {
 	return "minecraft:vine", 0
 }
 
-// EncodeBlock ...
 func (v Vines) EncodeBlock() (string, map[string]any) {
-	var bits int
+	var bits int32
 	for i, ok := range []bool{v.SouthDirection, v.WestDirection, v.NorthDirection, v.EastDirection} {
 		if ok {
 			bits |= 1 << i
 		}
 	}
-	return "minecraft:vine", map[string]any{"vine_direction_bits": int32(bits)}
+	if v.Up {
+		bits |= 16 // Set the 5th bit for top-attachment
+	}
+	return "minecraft:vine", map[string]any{"vine_direction_bits": bits}
 }
 
 // canSpreadTo returns true if the vines can spread onto the block at the
