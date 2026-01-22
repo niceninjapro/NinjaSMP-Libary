@@ -1,6 +1,10 @@
 package block
 
 import (
+	"math"
+	"math/rand/v2"
+	"time"
+
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/block/cube/trace"
 	"github.com/df-mc/dragonfly/server/event"
@@ -9,9 +13,6 @@ import (
 	"github.com/df-mc/dragonfly/server/world/particle"
 	"github.com/df-mc/dragonfly/server/world/sound"
 	"github.com/go-gl/mathgl/mgl64"
-	"math"
-	"math/rand/v2"
-	"time"
 )
 
 // ExplosionConfig is the configuration for an explosion. The world, position, size, sound, particle, and more can all
@@ -148,6 +149,9 @@ func (c ExplosionConfig) Explode(tx *world.Tx, explosionPos mgl64.Vec3) {
 	}
 
 	for _, pos := range affectedBlocks {
+		if hasDeny(tx, pos[0], pos[2]) {
+			continue
+		}
 		bl := tx.Block(pos)
 		if explodable, ok := bl.(Explodable); ok {
 			explodable.Explode(explosionPos, pos, tx, c)

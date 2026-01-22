@@ -1,12 +1,13 @@
 package block
 
 import (
+	"math"
+	"sync"
+
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/world"
-	"math"
-	"sync"
 )
 
 // LiquidRemovable represents a block that may be removed by a liquid flowing into it. When this happens, the
@@ -124,6 +125,9 @@ func sourceAround(b world.Liquid, pos cube.Pos, tx *world.Tx) (sourcePresent boo
 // flowInto makes the liquid passed flow into the position passed in a world. If successful, the block at that
 // position will be broken and the liquid with a lower depth will replace it.
 func flowInto(b world.Liquid, src, pos cube.Pos, tx *world.Tx, falling bool) bool {
+	if hasDeny(tx, pos[0], pos[2]) {
+		return false
+	}
 	newDepth := b.LiquidDepth() - b.SpreadDecay()
 	if falling {
 		newDepth = b.LiquidDepth()
@@ -263,6 +267,11 @@ func spreadNeighbour(b world.Liquid, src cube.Pos, tx *world.Tx, node liquidNode
 
 // canFlowInto checks if a liquid can flow into the block present in the world at a specific block position.
 func canFlowInto(b world.Liquid, tx *world.Tx, pos cube.Pos, sideways bool) bool {
+	// Before checking air or block types, we check if the target column is protected by a Deny block.
+	if hasDeny(tx, pos[0], pos[2]) {
+		return false
+	}
+
 	bl := tx.Block(pos)
 	if _, air := bl.(Air); air {
 		// Fast route for air: A type assert to a concrete type is much faster than a type assert to an interface.
@@ -366,4 +375,16 @@ func (q *liquidQueue) Reset() {
 	q.nodes = q.nodes[:0]
 	q.i = 0
 	q.shortestPath = math.MaxInt8
+}
+
+func hasDeny(tx *world.Tx, x, z int) bool {
+	r := tx.Range()
+	// Loop through the entire vertical column (from bottom to top of the world)
+	for y := r.Min(); y <= r.Max(); y++ {
+		// Replace 'Deny' with the actual name of your Deny block struct if it differs
+		if _, ok := tx.Block(cube.Pos{x, y, z}).(Deny); ok {
+			return true
+		}
+	}
+	return false
 }

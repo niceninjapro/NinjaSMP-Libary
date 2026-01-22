@@ -1,14 +1,15 @@
 package block
 
 import (
+	"math/rand/v2"
+	"time"
+
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/item/potion"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/df-mc/dragonfly/server/world/sound"
-	"math/rand/v2"
-	"time"
 )
 
 // Water is a natural fluid that generates abundantly in the world.
@@ -109,6 +110,9 @@ func (w Water) ScheduledTick(pos cube.Pos, tx *world.Tx, _ *rand.Rand) {
 			if !canFlowInto(w, tx, pos.Side(cube.FaceDown), true) {
 				// Only form a new source block if there either is no water below this block, or if the water
 				// below this is not falling (full source block).
+				if hasDeny(tx, pos[0], pos[2]) {
+					return
+				}
 				res := Water{Depth: 8, Still: true}
 				ctx := event.C(tx)
 				if tx.World().Handler().HandleLiquidFlow(ctx, pos, pos, res, w); ctx.Cancelled() {
