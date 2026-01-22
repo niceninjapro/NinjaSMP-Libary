@@ -490,7 +490,7 @@ func (s *Session) SendGameMode(c Controllable) {
 
 // SendAbilities sends the abilities of the Controllable entity of the session to the client.
 func (s *Session) SendAbilities(c Controllable) {
-	mode, abilities := c.GameMode(), uint32(0)
+	mode, abilities, permissionLevel := c.GameMode(), uint32(0), c.PermissionLevel()
 	if mode.AllowsFlying() {
 		abilities |= protocol.AbilityMayFly
 		if c.Flying() {
@@ -510,16 +510,26 @@ func (s *Session) SendAbilities(c Controllable) {
 	if mode.CreativeInventory() {
 		abilities |= protocol.AbilityInstantBuild
 	}
-	if mode.AllowsEditing() {
+	if mode.AllowsEditing() && permissionLevel != 0 {
 		abilities |= protocol.AbilityBuild | protocol.AbilityMine
 	}
-	if mode.AllowsInteraction() {
+	if mode.AllowsInteraction() && permissionLevel != 0 {
 		abilities |= protocol.AbilityDoorsAndSwitches | protocol.AbilityOpenContainers | protocol.AbilityAttackPlayers | protocol.AbilityAttackMobs
+	}
+	permissionPacket := packet.PermissionLevelMember
+	commandPacket := protocol.CommandPermissionLevelAny
+	if permissionLevel == 0 {
+		permissionPacket = packet.PermissionLevelVisitor
+	}
+	if permissionLevel == 2 {
+		abilities |= protocol.AbilityOperatorCommands | protocol.AbilityTeleport
+		permissionPacket = packet.PermissionLevelOperator
+		commandPacket = protocol.CommandPermissionLevelGameDirectors
 	}
 	s.writePacket(&packet.UpdateAbilities{AbilityData: protocol.AbilityData{
 		EntityUniqueID:     selfEntityRuntimeID,
-		PlayerPermissions:  packet.PermissionLevelMember,
-		CommandPermissions: protocol.CommandPermissionLevelAny,
+		PlayerPermissions:  byte(permissionPacket),
+		CommandPermissions: byte(commandPacket),
 		Layers: []protocol.AbilityLayer{
 			{
 				Type:             protocol.AbilityLayerTypeBase,
