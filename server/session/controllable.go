@@ -124,4 +124,5 @@ type Controllable interface {
 	SetSkin(skin.Skin)
 
 	UpdateDiagnostics(Diagnostics)
+	PermissionLevel() uint32
 }
