@@ -21,12 +21,6 @@ func NewLightning(opts world.EntitySpawnOpts) *world.EntityHandle {
 // NewLightningWithDamage creates a new lightning entities using the damage and
 // fire properties passed.
 func NewLightningWithDamage(opts world.EntitySpawnOpts, dmg float64, blockFire bool, entityFireDuration time.Duration) *world.EntityHandle {
-	// Check if the spawn position is within +/- 100 blocks of 0,0.
-	pos := opts.Position
-	if pos.X() > -100 && pos.X() < 100 && pos.Z() > -100 && pos.Z() < 100 {
-		return nil
-	}
-
 	conf := lightningConf
 	conf.Tick = (&lightningState{
 		Damage:             dmg,
