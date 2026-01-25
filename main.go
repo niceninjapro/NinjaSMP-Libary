@@ -31,7 +31,7 @@ func main() {
 
 	for p := range srv.Accept() {
 		_ = p
-		p.SetGameMode(world.GameModeCreative)
+		p.SetGameMode(world.GameModeSurvival)
 	}
 }
 
