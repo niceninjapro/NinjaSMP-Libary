@@ -238,10 +238,12 @@ func init() {
 	registerAll(allCopperTrapdoors())
 	registerAll(allBeeNests())
 	registerAll(allGlowLichens())
+	registerAll(allSnowLayers())
 }
 
 func init() {
 	world.RegisterItem(Air{})
+	world.RegisterItem(SnowLayer{})
 	world.RegisterItem(Amethyst{})
 	world.RegisterItem(AncientDebris{})
 	world.RegisterItem(Andesite{Polished: true})

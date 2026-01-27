@@ -185,6 +185,7 @@ const (
 	hashSmoker
 	hashSmoothBasalt
 	hashSnow
+	hashSnowLayer
 	hashSoulSand
 	hashSoulSoil
 	hashSponge
@@ -946,6 +947,10 @@ func (SmoothBasalt) Hash() (uint64, uint64) {
 
 func (Snow) Hash() (uint64, uint64) {
 	return hashSnow, 0
+}
+
+func (s SnowLayer) Hash() (uint64, uint64) {
+	return hashSnowLayer, uint64(s.Height) | uint64(boolByte(s.Covered))<<8
 }
 
 func (SoulSand) Hash() (uint64, uint64) {
