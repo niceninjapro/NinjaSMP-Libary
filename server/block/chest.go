@@ -2,16 +2,19 @@ package block
 
 import (
 	"fmt"
+	"math/rand"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/internal/nbtconv"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/item/inventory"
 	"github.com/df-mc/dragonfly/server/world"
+	"github.com/df-mc/dragonfly/server/world/loot"
 	"github.com/df-mc/dragonfly/server/world/sound"
 	"github.com/go-gl/mathgl/mgl64"
-	"strings"
-	"sync"
-	"time"
 )
 
 // Chest is a container block which may be used to store items. Chests may also be paired to create a bigger
@@ -28,6 +31,7 @@ type Chest struct {
 	// CustomName is the custom name of the chest. This name is displayed when the chest is opened, and may
 	// include colour codes.
 	CustomName string
+	LootTable  string
 
 	paired       bool
 	pairX, pairZ int
@@ -145,8 +149,41 @@ func (c Chest) RemoveViewer(v ContainerViewer, tx *world.Tx, pos cube.Pos) {
 	}
 }
 
+// generateLoot handles the calling of the loot system.
+func (c Chest) generateLoot(tx *world.Tx, pos cube.Pos) {
+	stacks, ok := loot.Generate(c.LootTable)
+	if !ok {
+		// If ok is false, an error was logged to console.
+		// We DO NOT clear the LootTable string, allowing the admin to fix the file and try again.
+		return
+	}
+
+	if len(stacks) == 0 {
+		// Table loaded but produced no items (bad RNG or empty table).
+		// We treat this as a success and clear the tag so it doesn't try again.
+		c.LootTable = ""
+		tx.SetBlock(pos, c, nil)
+		return
+	}
+
+	inv := c.Inventory(tx, pos)
+	for _, s := range stacks {
+		slot := rand.Intn(inv.Size())
+		_ = inv.SetItem(slot, s)
+	}
+
+	// Loot generated successfully, clear the tag.
+	c.LootTable = ""
+	tx.SetBlock(pos, c, nil)
+}
+
 // Activate ...
 func (c Chest) Activate(pos cube.Pos, _ cube.Face, tx *world.Tx, u item.User, _ *item.UseContext) bool {
+	if c.LootTable != "" {
+		c.generateLoot(tx, pos)
+		// Refresh the chest variable after modification
+		c = tx.Block(pos).(Chest)
+	}
 	if opener, ok := u.(ContainerOpener); ok {
 		if c.paired {
 			if d, ok := tx.Block(c.pairPos(pos).Side(cube.FaceUp)).(LightDiffuser); !ok || d.LightDiffusionLevel() > 2 {
@@ -301,6 +338,7 @@ func (c Chest) DecodeNBT(data map[string]any) any {
 	c = NewChest()
 	c.Facing = facing
 	c.CustomName = nbtconv.String(data, "CustomName")
+	c.LootTable = nbtconv.String(data, "LootTable")
 
 	pairX, ok := data["pairx"]
 	pairZ, ok2 := data["pairz"]
@@ -328,6 +366,9 @@ func (c Chest) EncodeNBT() map[string]any {
 	m := map[string]any{
 		"Items": nbtconv.InvToNBT(c.inventory),
 		"id":    "Chest",
+	}
+	if c.LootTable != "" {
+		m["LootTable"] = c.LootTable
 	}
 	if c.CustomName != "" {
 		m["CustomName"] = c.CustomName
