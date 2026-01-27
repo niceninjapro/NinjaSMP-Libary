@@ -112,7 +112,6 @@ func (blockPaletteEncoding) DecodeBlockState(m map[string]any) (uint32, error) {
 	if !ok {
 		airRID, airFound := StateToRuntimeID("minecraft:air", nil)
 		if airFound {
-			fmt.Printf("Fallback: Unknown block '%v' replaced with air\n", upgraded.Name)
 			return airRID, nil
 		}
 		return 0, fmt.Errorf("cannot get runtime ID of block state %v{%+v} %v", upgraded.Name, upgraded.Properties, upgraded.Version)

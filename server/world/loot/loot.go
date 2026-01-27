@@ -1,10 +1,10 @@
 package loot
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"os"
 	"strings"
 
 	"github.com/df-mc/dragonfly/server/item"
@@ -13,17 +13,31 @@ import (
 	"github.com/df-mc/dragonfly/server/world"
 )
 
-// Generate loads a loot table from the given path and generates items.
-func Generate(path string) ([]item.Stack, bool) {
-	// Add your actual folder path here as a prefix
-	fullPath := "server/world/loot/" + path
+//go:embed loot_tables/*
+var lootFS embed.FS //
 
-	t, err := LoadTable(fullPath)
+// Generate loads a loot table from the embedded filesystem and generates items.
+func Generate(path string) ([]item.Stack, bool) {
+	// We no longer prefix with "server/world/loot/".
+	// The path passed should be relative to the loot_tables folder (e.g., "chests/dungeon.json").
+	t, err := LoadTable(path)
 	if err != nil {
-		fmt.Printf("[Loot System] Error loading table '%s': %v\n", fullPath, err)
+		fmt.Printf("[Loot System] Error loading table '%s': %v\n", path, err)
 		return nil, false
 	}
 	return t.Generate(), true
+}
+
+// LoadTable reads the JSON data directly from the embedded memory.
+func LoadTable(path string) (LootTable, error) {
+	// b, err := os.ReadFile(path) is replaced by:
+	b, err := lootFS.ReadFile(path)
+	if err != nil {
+		return LootTable{}, err
+	}
+	var t LootTable
+	err = json.Unmarshal(b, &t)
+	return t, err
 }
 
 // Generate processes the entire LootTable and returns a slice of all stacks generated.
@@ -93,16 +107,6 @@ func (v *Value) UnmarshalJSON(data []byte) error {
 }
 
 // --- Logic ---
-
-func LoadTable(path string) (LootTable, error) {
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return LootTable{}, err
-	}
-	var t LootTable
-	err = json.Unmarshal(b, &t)
-	return t, err
-}
 
 func (p *Pool) rollEntry() (item.Stack, bool) {
 	totalWeight := 0
