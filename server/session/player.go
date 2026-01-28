@@ -90,6 +90,11 @@ func (s *Session) SendRespawn(pos mgl64.Vec3, c Controllable) {
 	})
 }
 
+// SendPacket sends a packet to the player
+func (s *Session) SendPacket(pk packet.Packet) {
+	s.writePacket(pk)
+}
+
 // SendPlayerSpawn updates the player's spawn point on the client-side. There is currently little reason
 // to do so other than to prevent the client-side "Respawn point set" message when sleeping in a bed.
 func (s *Session) SendPlayerSpawn(pos mgl64.Vec3) {

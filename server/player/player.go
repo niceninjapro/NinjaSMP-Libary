@@ -12,6 +12,7 @@ import (
 
 	"github.com/df-mc/dragonfly/server/player/debug"
 	"github.com/df-mc/dragonfly/server/player/hud"
+	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 
 	"github.com/df-mc/dragonfly/server/block"
 	"github.com/df-mc/dragonfly/server/block/cube"
@@ -237,6 +238,10 @@ func (p *Player) Message(a ...any) {
 // according to the fmt.Sprintf formatting rules.
 func (p *Player) Messagef(f string, a ...any) {
 	p.session().SendMessage(fmt.Sprintf(f, a...))
+}
+
+func (p *Player) SendPacket(pk packet.Packet) {
+	p.session().SendPacket(pk)
 }
 
 // Messaget sends a translatable message to a player and parameterises it using
