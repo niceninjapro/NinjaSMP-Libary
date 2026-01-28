@@ -103,10 +103,16 @@ func (s *Session) SendPlayerSpawn(pos mgl64.Vec3) {
 }
 
 func (s *Session) SyncMotion(velocity mgl32.Vec3, e world.Entity) {
-	entityRuntimeID := s.entityRuntimeID(e)
+	id := s.entityRuntimeID(e)
+	if id == 0 {
+		return
+	}
+
+	s.syncTarget = id
+	s.syncTime = time.Now()
 
 	s.writePacket(&packet.SetActorMotion{
-		EntityRuntimeID: entityRuntimeID,
+		EntityRuntimeID: id,
 		Velocity:        velocity,
 	})
 }

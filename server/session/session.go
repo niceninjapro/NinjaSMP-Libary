@@ -574,10 +574,3 @@ func (s *Session) sendAvailableEntities(w *world.World) {
 	}
 	s.writePacket(&packet.AvailableActorIdentifiers{SerialisedEntityIdentifiers: serializedEntityData})
 }
-
-func (s *Session) SetAttackSync(targetID uint64) {
-	if s != nil {
-		s.syncTarget = targetID
-		s.syncTime = time.Now()
-	}
-}
