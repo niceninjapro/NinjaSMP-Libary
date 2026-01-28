@@ -239,8 +239,8 @@ func (p *Player) Messagef(f string, a ...any) {
 	p.session().SendMessage(fmt.Sprintf(f, a...))
 }
 
-func (p *Player) SyncMotion(velocity mgl32.Vec3) {
-	p.session().SyncMotion(velocity)
+func (p *Player) SyncMotion(velocity mgl32.Vec3, e world.Entity) {
+	p.session().SyncMotion(velocity, e)
 }
 
 // Messaget sends a translatable message to a player and parameterises it using

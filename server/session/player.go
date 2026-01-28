@@ -91,9 +91,10 @@ func (s *Session) SendRespawn(pos mgl64.Vec3, c Controllable) {
 }
 
 // SyncMotion sends a velocity packet to the player
-func (s *Session) SyncMotion(velocity mgl32.Vec3) {
+func (s *Session) SyncMotion(velocity mgl32.Vec3, e world.Entity) {
+	entityRuntimeID := s.entityRuntimeID(e)
 	s.writePacket(&packet.SetActorMotion{
-		EntityRuntimeID: selfEntityRuntimeID,
+		EntityRuntimeID: entityRuntimeID,
 		Velocity:        velocity,
 	})
 }
