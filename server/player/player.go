@@ -33,6 +33,7 @@ import (
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/df-mc/dragonfly/server/world/particle"
 	"github.com/df-mc/dragonfly/server/world/sound"
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/go-gl/mathgl/mgl64"
 	"github.com/google/uuid"
 	"golang.org/x/text/language"
@@ -2565,6 +2566,12 @@ func (p *Player) Drop(s item.Stack) int {
 func (p *Player) OpenBlockContainer(pos cube.Pos, tx *world.Tx) {
 	if p.session() != session.Nop {
 		p.session().OpenBlockContainer(pos, tx)
+	}
+}
+
+func (p *Player) SyncMotion(velocity mgl32.Vec3, e world.Entity) {
+	if p.session() != session.Nop {
+		p.session().SyncMotion(velocity, e)
 	}
 }
 

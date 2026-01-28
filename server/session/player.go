@@ -102,6 +102,15 @@ func (s *Session) SendPlayerSpawn(pos mgl64.Vec3) {
 	})
 }
 
+func (s *Session) SyncMotion(velocity mgl32.Vec3, e world.Entity) {
+	entityRuntimeID := s.entityRuntimeID(e)
+
+	s.writePacket(&packet.SetActorMotion{
+		EntityRuntimeID: entityRuntimeID,
+		Velocity:        velocity,
+	})
+}
+
 // sendBiomes sends all the vanilla biomes to the session.
 func (s *Session) sendBiomes() {
 	definitions, stringList := world.BiomeDefinitions()
