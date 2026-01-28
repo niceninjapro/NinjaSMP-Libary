@@ -2389,6 +2389,10 @@ func (p *Player) SetVelocity(velocity mgl64.Vec3) {
 	}
 }
 
+func (p *Player) Session() *session.Session {
+	return p.session()
+}
+
 // Rotation returns the yaw and pitch of the player in degrees. Yaw is horizontal rotation (rotation around the
 // vertical axis, 0 when facing forward), pitch is vertical rotation (rotation around the horizontal axis, also 0
 // when facing forward).
