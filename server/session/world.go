@@ -224,7 +224,6 @@ func (s *Session) ViewEntityVelocity(e world.Entity, velocity mgl64.Vec3) {
 
 	// 1. Check the flag
 	if s.syncing {
-		s.syncing = false // Reset immediately
 
 		// 2. Use the stored position (No more s.p, s.c, or Tx errors!)
 		attackerPos := s.syncPos
