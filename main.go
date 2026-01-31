@@ -19,7 +19,7 @@ func main() {
 
 	srv := conf.New()
 	srv.CloseOnProgramEnd()
-	
+
 	srv.Listen()
 	for p := range srv.Accept() {
 		_ = p
