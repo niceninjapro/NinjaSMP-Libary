@@ -15,7 +15,7 @@ type BrownMushroom struct {
 
 // BreakInfo ...
 func (b BrownMushroom) BreakInfo() BreakInfo {
-	return newBreakInfo(0, nothingEffective, alwaysHarvestable, oneOf(b))
+	return newBreakInfo(0, alwaysHarvestable, nothingEffective, oneOf(b))
 }
 
 // CompostChance ...
