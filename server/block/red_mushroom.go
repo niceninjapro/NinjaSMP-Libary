@@ -15,7 +15,7 @@ type RedMushroom struct {
 
 // BreakInfo ...
 func (r RedMushroom) BreakInfo() BreakInfo {
-	return newBreakInfo(0, nothingEffective, alwaysHarvestable, oneOf(r))
+	return newBreakInfo(0, alwaysHarvestable, nothingEffective, oneOf(r))
 }
 
 // CompostChance ...
