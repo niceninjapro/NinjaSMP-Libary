@@ -716,27 +716,6 @@ func (p *Player) Absorption() float64 {
 	return p.absorptionHealth
 }
 
-// SetWindChargeProtection sets the wind charge protection.
-func (p *Player) SetWindChargeProtection(y float64) {
-	p.windBurstY = y
-	p.windChargeProtected = true
-}
-
-// IsWindChargeProtected returns if the player is protected from fall damage.
-func (p *Player) IsWindChargeProtected() bool {
-	return p.windChargeProtected
-}
-
-// GetWindBurstY returns the wind burst Y.
-func (p *Player) GetWindBurstY() float64 {
-	return p.windBurstY
-}
-
-// SetLaunchY sets the launch Y for fall damage calculation.
-func (p *Player) SetLaunchY(y float64) {
-	p.launchY = y
-}
-
 // KnockBack knocks the player back with a given force and height. A source is passed which indicates the
 // source of the velocity, typically the position of an attacking entity. The source is used to calculate the
 // direction which the entity should be knocked back in.
@@ -2543,12 +2522,6 @@ func (p *Player) Drop(s item.Stack) int {
 func (p *Player) OpenBlockContainer(pos cube.Pos, tx *world.Tx) {
 	if p.session() != session.Nop {
 		p.session().OpenBlockContainer(pos, tx)
-	}
-}
-
-func (p *Player) SyncMotion(velocity mgl32.Vec3, e world.Entity) {
-	if p.session() != session.Nop {
-		p.session().SyncMotion(velocity, e)
 	}
 }
 
